@@ -185,6 +185,9 @@ test {
   inspect(content="true", c == d)
   inspect(content="true", e == f)
   inspect(content="true", g == h)
-  inspect(content="Some(List<(Double, Double, Int, Int, Int)>)", unification(ua, ub))
+  inspect(
+    content="Some(List<(Double, Double, Int, Int, Int)>)",
+    unification(ua, ub),
+  )
   inspect(content="None", unification(uc, ud))
 }

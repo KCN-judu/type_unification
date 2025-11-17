@@ -1,0 +1,2 @@
+moon fmt
+moon info
