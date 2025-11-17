@@ -1,10 +1,10 @@
 {
   "name": "KCN-judu/type_unification",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "readme": "README.mbt.md",
-  "repository": "",
+  "repository": "https://github.com/KCN-judu/type_unification",
   "license": "Apache-2.0",
   "keywords": [],
-  "description": "",
+  "description": "a type unification library written in MoonBit.",
   "source": "src"
 }

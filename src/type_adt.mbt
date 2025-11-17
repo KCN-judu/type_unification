@@ -135,21 +135,30 @@ pub fn unification(t1 : Type, t2 : Type) -> Type? {
       } else {
         let a_subst = a.copy()
         let b_subst = b.copy()
+        let a_gn = Set::new()
+        let b_gn = Set::new()
         for i in 0..<a.length() {
           if a[i] is Generic(ga) && !(b[i] is Generic(_)) {
+            a_gn.add(ga)
             for j in 0..<a.length() {
               a_subst[j] = subst_generic_vertical(b[i], ga, a_subst[j])
             }
           } else if b[i] is Generic(gb) && !(a[i] is Generic(_)) {
+            b_gn.add(gb)
             for j in 0..<a.length() {
               b_subst[j] = subst_generic_vertical(a[i], gb, b_subst[j])
             }
+          } else if a[i] is Generic(ga) && b[i] is Generic(gb) {
+            a_gn.add(ga)
+            b_gn.add(gb)
           } else if a[i] != b[i] {
             return None
           }
         }
         if a_subst == b_subst {
-          Some(Tuple(a_subst))
+          Some(
+            Tuple(if a_gn.length() > b_gn.length() { a_subst } else { b_subst }),
+          )
         } else {
           None
         }
@@ -168,19 +177,11 @@ test {
   let f = Generic("A")
   let g = Tuple([e, e, f, f, f])
   let h = Tuple([f, f, e, e, e])
-  let ua = Constructor(
-    "List",
-    Tuple([Generic("T"), Generic("T"), int, int, int]),
-  )
-  let ub = Constructor(
-    "List",
-    Tuple([double, double, Generic("A"), Generic("A"), Generic("A")]),
-  )
-  let uc = Constructor(
-    "List",
-    Tuple([Generic("T"), Generic("T"), Generic("T"), Generic("T"), Generic("T")]),
-  )
+  let ua = Constructor("List", Tuple([e, e, int, int, int]))
+  let ub = Constructor("List", Tuple([double, double, f, f, f]))
+  let uc = Constructor("List", Tuple([e, e, e, e, e]))
   let ud = Constructor("List", Tuple([double, double, int, int, int]))
+  let ue = Constructor("List", Tuple([f, f, e, e, e]))
   inspect(content="false", a == b)
   inspect(content="true", c == d)
   inspect(content="true", e == f)
@@ -190,4 +191,10 @@ test {
     unification(ua, ub),
   )
   inspect(content="None", unification(uc, ud))
+  let uce = unification(uc, ue)
+  inspect(content="List<(Aᴳ, Aᴳ, Tᴳ, Tᴳ, Tᴳ)>", uce.unwrap())
+  inspect(
+    content="List<(Double, Double, Int, Int, Int)>",
+    unification(uce.unwrap(), ud),
+  )
 }
