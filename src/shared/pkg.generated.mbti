@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "KCN-judu/type_unification/shared"
+
+import(
+  "KCN-judu/type_unification/type_adt"
+)
+
+// Values
+fn eq(@type_adt.Type, @type_adt.Type) -> Bool
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

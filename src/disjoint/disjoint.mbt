@@ -1,32 +1,4 @@
 ///|
-pub(all) enum Type {
-  Basic(String)
-  Generic(String)
-  Tuple(Array[Type])
-  Function(Type, Type)
-  Constructor(String, Type)
-}
-
-///|
-pub impl Show for Type with to_string(s) {
-  match s {
-    Basic(s) => s
-    Generic(s) => "\{s}ᴳ"
-    Tuple(s) => {
-      let content = s.map(Show::to_string).join(", ")
-      "(\{content})"
-    }
-    Function(s, t) => "\{s} -> \{t}"
-    Constructor(s, t) => "\{s}<\{t}>"
-  }
-}
-
-///|
-pub impl Show for Type with output(s, l) {
-  l.write_string(s.to_string())
-}
-
-///|
 fn generic_distribution(arr_types : Array[Type]) -> Map[Int, Set[Int]] {
   let name = []
   let res : Map[Int, Set[Int]] = Map::new()
@@ -77,26 +49,26 @@ fn subst_generic_horizontal(t : Type, g : String, o : Type) -> Type {
 }
 
 ///|
-pub impl Eq for Type with equal(s, o) {
-  match s {
+pub fn eq(a : Type, b : Type) -> Bool {
+  match a {
     Function(s_x, s_y) =>
-      if o is Function(o_x, o_y) {
-        s_x == o_x && s_y == o_y
+      if b is Function(o_x, o_y) {
+        eq(s_x, o_x) && eq(s_y, o_y)
       } else {
         false
       }
     Tuple(s) =>
-      if o is Tuple(o) {
+      if b is Tuple(o) {
         s.length() == o.length() &&
         generic_distribution(s) == generic_distribution(o)
       } else {
         false
       }
-    Generic(_) => o is Generic(_)
-    Basic(s) => if o is Basic(o) { s == o } else { false }
+    Generic(_) => b is Generic(_)
+    Basic(s) => if b is Basic(o) { s == o } else { false }
     Constructor(s_n, s_t) =>
-      if o is Constructor(o_n, o_t) {
-        s_n == o_n && s_t == o_t
+      if b is Constructor(o_n, o_t) {
+        s_n == o_n && eq(s_t, o_t)
       } else {
         false
       }
@@ -144,11 +116,11 @@ pub fn unification(t1 : Type, t2 : Type) -> Type? {
             for j in 0..<a.length() {
               b_subst[j] = subst_generic_vertical(a[i], gb, b_subst[j])
             }
-          } else if a[i] != b[i] {
+          } else if !eq(a[i], b[i]) {
             return None
           }
         }
-        if a_subst == b_subst {
+        if array_eq(a_subst, b_subst, eq) {
           Some(Tuple(a_subst))
         } else {
           None
@@ -160,20 +132,20 @@ pub fn unification(t1 : Type, t2 : Type) -> Type? {
 
 ///|
 test {
-  let a = Constructor("List", int)
-  let b = Constructor("List", double)
-  let c = Constructor("Array", Tuple([int, Generic("T")]))
-  let d = Constructor("Array", Tuple([int, Generic("A")]))
-  let e = Generic("T")
-  let f = Generic("A")
-  let g = Tuple([e, e, f, f, f])
-  let h = Tuple([f, f, e, e, e])
-  let ua = Constructor("List", Tuple([e, e, int, int, int]))
-  let ub = Constructor("List", Tuple([double, double, f, f, f]))
-  inspect(content="false", a == b)
-  inspect(content="true", c == d)
-  inspect(content="true", e == f)
-  inspect(content="true", g == h)
+  let a = Type::Constructor("List", int)
+  let b = Type::Constructor("List", double)
+  let e = Type::Generic("T")
+  let f = Type::Generic("A")
+  let c = Type::Constructor("Array", Type::Tuple([int, e]))
+  let d = Type::Constructor("Array", Type::Tuple([int, f]))
+  let g = Type::Tuple([e, e, f, f, f])
+  let h = Type::Tuple([f, f, e, e, e])
+  let ua = Type::Constructor("List", Type::Tuple([e, e, int, int, int]))
+  let ub = Type::Constructor("List", Type::Tuple([double, double, f, f, f]))
+  inspect(content="false", eq(a, b))
+  inspect(content="true", eq(c, d))
+  inspect(content="true", eq(e, f))
+  inspect(content="true", eq(g, h))
   inspect(
     content="Some(List<(Double, Double, Int, Int, Int)>)",
     unification(ua, ub),

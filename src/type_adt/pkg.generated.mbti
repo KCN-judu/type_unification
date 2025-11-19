@@ -1,0 +1,40 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "KCN-judu/type_unification/type_adt"
+
+// Values
+fn array_eq(Array[Type], Array[Type], (Type, Type) -> Bool) -> Bool
+
+let bool : Type
+
+let char : Type
+
+let double : Type
+
+let float : Type
+
+let int : Type
+
+let int16 : Type
+
+let int64 : Type
+
+let string : Type
+
+let unit : Type
+
+// Errors
+
+// Types and methods
+pub(all) enum Type {
+  Basic(String)
+  Generic(String)
+  Tuple(Array[Type])
+  Function(Type, Type)
+  Constructor(String, Type)
+}
+impl Show for Type
+
+// Type aliases
+
+// Traits
+

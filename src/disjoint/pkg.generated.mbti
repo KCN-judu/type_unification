@@ -1,0 +1,20 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "KCN-judu/type_unification/disjoint"
+
+import(
+  "KCN-judu/type_unification/type_adt"
+)
+
+// Values
+fn eq(@type_adt.Type, @type_adt.Type) -> Bool
+
+fn unification(@type_adt.Type, @type_adt.Type) -> @type_adt.Type?
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+
